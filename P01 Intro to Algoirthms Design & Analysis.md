@@ -82,3 +82,108 @@ Best case scenario: Input is sorted increasing order. inner loop is theta(1) res
 
 Worst case scenario: input is sorted in decreasing order. We must do the full ci operations in the ith iteration for the inner loop. This results in 
 
+## Merge Sort
+
+Divide-and-Conquer
+
+### English
+
+1. Split input into two sublists (approx 1/2 in size)
+2. Recursively sort the sublists
+3. Merge the sorted sublists
+
+### Pseudocode
+
+```
+def merge_sort(A,l,r):
+	n = r - l
+	if n > 1:
+		merge_sort(A, l, l + n / 2)
+		merge_sort(A, l + n / 2, r)
+		merge(A, l, l + n / 2, r)
+
+def merge(A, l, m, r):
+	L = A[l:m] + [float('inf')]
+	R = A[m:r] + [float('inf')]
+	i, j = 0, 0
+
+	while i + j < r - l:
+		if L[i] <= R[j]:
+			A[l + i + j] = L[i]
+			i += 1
+		else:
+			A[l + i + j] = R[j]
+			j += 1
+```
+
+### Correctness
+
+#### Merge
+
+S_i,j: Before iteration i,j:
+
+1) A[l:l+i+j] contains the i+j smallest elements of L and R in sorted order
+2) L[i] and R[j] are the smallest elements of L R not yet copied back into A
+
+Proof:
+
+Base case:
+
+prove S_0,0: A[l:l] == [] has 0 smallest elements of L & R, sorted
+
+Assume:
+
+1) A[l:l+i+j] contains the i+j smallest elements of L and R in sorted order
+2) L[i] and R[j] are the smallest elements of L R not yet copied back into A
+
+Maintenance: S_i,j => S_i+1,j if L[i] <= R[j] or => S_i,j+1 if R[j] < L[i]
+
+WLOG: L[i] <= R[j]
+
+L[i] is the smallest element in L or R not yet copied back to A prior to iteration i,j
+
+A[l:l + i + j + 1] will have the i + j + 1 smallest elements of L and R
+
+Since L was sorted, L[i + 1] will be the smallest element of L not yet copied, and since R was touched R[j] is still the smallest element of R
+
+Termination: S_i,j is true when i + j == r - l - 1 => true at the end of the iteration => true at the end of the loop
+
+Therefore it must be true when i + j == r - l, A[l:l + r - l] == A[l:r] has all the finite elements of L and R in sorted order.
+
+#### Merge sort
+
+Base case: r - l <= 1. In this case the list contains only 1 element which must be sorted
+
+Assumption: Given r - l. Suppose merge_sort works correctly for all n < r - l.
+
+Induction. The recursive calls to merge_sort function correctly based on induction, and the merge combining the two sublists to a single sorted list function correctly (from the previous section). Therefore merge_sort works.
+
+### Analysis
+
+T(n) = theta(1) for n <= 1, 2*T(n/2) + theta(n) for n > 1
+
+Given:
+- a equally-sized subproblems
+- n/b in size
+- c(n) combine time
+- D(n) divide time
+
+T(n) = theta(1) for n <= n_0, a*T(n/b) + C(n) + D(n) for n > n_0
+
+Branching tree. The root level that takes T(n) time makes 2 calls that take T(n/2)
+
+This results in d*C leaves where C is constant. d is the depth which is log_2(n). Therefore T(n) = theta(n log n)
+
+## Recap
+
+- Framework
+	1. Basic idea English
+	2. Implement
+	3. Prove Correctness
+	4. Analyze for runtime & memory usage
+- Loop Invariants
+	1. Initialization - prove the invariant holds before the first iteration of the loop
+	2. Maintenance - prove that if the invariant holds before iteration a, then it holds for iteration a + 1
+	2. Termination - proof that the invariant holds when the loop terminates (usually trivial if the loop doesn't terminate part-way through)
+- Divide-and-Conquer
+- Analysis of which algorithm is most appropriate given consideration to memory and time
